@@ -93,5 +93,5 @@ ingress:
   enabled: true
   scheme: internet-facing
   hosts:
-    vote: "asd"
-    result: "asd"
+    vote: "vote.100.55.206.115.nip.io"
+    result: "result.100.55.206.115.nip.io"
