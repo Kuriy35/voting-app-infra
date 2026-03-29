@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "votingApp.fullname" . }}-worker
+  labels:
+    app: worker
+    {{- include "votingApp.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.worker.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+        app: worker
+  template:
+    metadata:
+      name: {{ include "votingApp.fullname" . }}-worker
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: {{ include "votingApp.workerImage" . }}
+          env:
+            - name: REDIS_HOST
+              value: "{{ .Release.Name }}-redis-master"
+          {{- with .Values.postgresql.auth }}
+            - name: DB_HOST
+              value: "{{ $.Release.Name }}-postgresql"
+            - name: DB_USERNAME
+              value: {{ .username | quote }}
+            - name: DB_PASSWORD
+              {{- if not (empty .existingSecret) }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .existingSecret | quote}}
+                  key: {{ .secretKeys.userPassword }}
+              {{- else }}
+              value: {{ .password | quote }}
+              {{- end }}
+            - name: DB_NAME
+              value: {{ .database | quote }}
+          {{- end }}

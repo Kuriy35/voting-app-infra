@@ -1,0 +1,19 @@
+{{- if .Values.gateway.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "votingApp.fullname" . }}-gateway
+  labels:
+    {{- include "votingApp.labels" . | nindent 4 }}
+spec:
+  gatewayClassName: {{ .Values.gateway.gatewayClassName }}
+  listeners:
+    {{- range .Values.gateway.listeners }}
+    - name: {{ .name }}
+      protocol: {{ .protocol }}
+      port: {{ .port }}
+      allowedRoutes:
+        namespaces:
+          from: Same
+    {{- end -}}
+{{- end -}}

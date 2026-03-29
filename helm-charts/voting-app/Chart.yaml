@@ -1,0 +1,14 @@
+apiVersion: v2
+name: voting-app
+description: Docker sample voting application
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: redis
+    version: 24.1.0
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: postgresql
+    version: 18.2.0
+    repository: "https://charts.bitnami.com/bitnami"

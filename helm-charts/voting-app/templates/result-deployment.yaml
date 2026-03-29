@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "votingApp.fullname" . }}-result
+  labels:
+    app: result
+    {{- include "votingApp.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.result.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      name: {{ include "votingApp.fullname" . }}-result
+      labels:
+        app: result
+    spec:
+      containers:
+        - name: result
+          image: {{ include "votingApp.resultImage" . }}
+          ports:
+            - containerPort: {{ .Values.result.service.internalPort }}
+              protocol: TCP
+          {{- with .Values.postgresql.auth }}
+          env:
+            - name: DB_HOST
+              value: "{{ $.Release.Name }}-postgresql"
+            - name: DB_USERNAME
+              value: {{ .username | quote }}
+            - name: DB_PASSWORD
+              {{- if not (empty .existingSecret) }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .existingSecret | quote}}
+                  key: {{ .secretKeys.userPassword }}
+              {{- else }}
+              value: {{ .password | quote }}
+              {{- end }}
+            - name: DB_NAME
+              value: {{ .database | quote }}
+          {{- end }}

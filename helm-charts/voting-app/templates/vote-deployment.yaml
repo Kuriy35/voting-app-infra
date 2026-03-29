@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "votingApp.fullname" . }}-vote
+  labels:
+    app: vote
+    {{- include "votingApp.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.vote.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      app: vote
+  template:
+    metadata:
+      name: {{ include "votingApp.fullname" . }}-vote
+      labels:
+        app: vote
+    spec:
+      containers:
+        - name: vote
+          image: {{ include "votingApp.voteImage" . }}
+          ports:
+            - containerPort: {{ .Values.vote.service.internalPort }}
+              protocol: TCP
+          env:
+            - name: REDIS_HOST
+              value: "{{ .Release.Name }}-redis-master"
