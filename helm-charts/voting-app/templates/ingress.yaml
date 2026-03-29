@@ -32,7 +32,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "votingApp.fullname" . }}
+                name: {{ include "votingApp.fullname" . }}-result-svc
                 port:
                   number: {{ .Values.result.service.externalPort }}
     {{- end }}
