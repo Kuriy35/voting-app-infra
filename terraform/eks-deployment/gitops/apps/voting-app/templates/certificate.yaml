@@ -14,17 +14,17 @@ spec:
         {{- $certName = index $names 0 -}}
       {{- end -}}
     {{- end -}}
-  {{- end -}}
+  {{- end }}
   secretName: {{ $certName | default "voting-app-tls-secret" | quote }}
   
   issuerRef:
-    name: {{ .Values.clusterIssuerName }}
+    name: {{ .Values.clusterIssuerName | quote }}
     kind: ClusterIssuer
     
-  commonName: {{ .Values.gateway.routing.vote.hostname }}
+  commonName: {{ .Values.gateway.routing.vote.hostname | quote }}
   
   dnsNames:
     {{- range .Values.gateway.routing }}
-    - {{ .hostname }}
+    - {{ .hostname | quote }}
     {{- end }}
 {{- end -}}
