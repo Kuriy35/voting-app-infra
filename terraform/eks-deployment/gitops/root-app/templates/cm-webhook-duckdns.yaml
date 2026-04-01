@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-webhook-duckdns
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://mmontes11.github.io/charts
+    chart: cert-manager-webhook-duckdns
+    targetRevision: "1.2.3"
+    helm:
+      valuesObject:
+        groupName: {{ .Values.duckdns.clusterIssuer.groupName }}
+        secret:
+          existingSecret: true
+          existingSecretName: {{ .Values.duckdns.tokenSecretName }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

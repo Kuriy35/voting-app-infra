@@ -13,3 +13,13 @@ override.tf.json
 
 .terraformrc
 terraform.rc
+
+.terragrunt-cache/
+
+terragrunt-debug.tfvars.json
+
+.terragrunt-cache-*/
+
+provider.tf
+backend.tf
+versions.tf

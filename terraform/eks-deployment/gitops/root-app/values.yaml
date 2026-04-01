@@ -1,0 +1,17 @@
+clusterName: ""
+vpcId: ""
+
+externalSecrets:
+  serviceAccount:
+    name: "external-secrets-sa"
+  irsaRoleArn: ""
+
+duckdns:
+  tokenSecretName: ""
+  clusterIssuer:
+    name: "letsencrypt-duckdns"
+    email: "vjbvbhijk3@gmail.com"
+    groupName: "acme.duckdns.org"
+
+votingApp:
+  gitRepoURL: "https://github.com/Kuriy35/voting-app-infra.git"

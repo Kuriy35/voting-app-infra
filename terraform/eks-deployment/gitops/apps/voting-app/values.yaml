@@ -1,0 +1,106 @@
+global:
+  security:
+    allowInsecureImages: true
+
+fullnameOverride: ""
+
+result:
+  replicaCount: 1
+
+  image:
+    registry: "docker.io"
+    repository: "kuriy/voting-app-result"
+    tag: "latest"
+
+  service:
+    type: "ClusterIP"
+    externalPort: 8081
+    internalPort: 80
+    nodePort: 30081
+    name: "result"
+
+vote:
+  replicaCount: 1
+
+  image:
+    registry: "docker.io"
+    repository: "kuriy/voting-app-vote"
+    tag: "latest"
+
+  service:
+    type: "ClusterIP"
+    externalPort: 8080
+    internalPort: 80
+    nodePort: 30080
+    name: "vote"
+
+worker:
+  replicaCount: 1
+
+  image:
+    registry: "docker.io"
+    repository: "kuriy/voting-app-worker"
+    tag: "latest"
+
+redis:
+  networkPolicy:
+    enabled: false
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  image:
+    registry: "public.ecr.aws"
+    repository: "bitnami/redis"
+    tag: "latest"
+
+postgresql:
+  networkPolicy:
+    enabled: false
+  auth:
+    enabled: true
+    database: "votingdb"
+    username: "votingUser"
+    password: "Password123_"
+    existingSecret: ""
+    secretKeys:
+      userPassword: "password"
+  primary:
+    persistence:
+      enabled: false
+  image:
+    registry: "public.ecr.aws"
+    repository: "bitnami/postgresql"
+    tag: "latest"
+
+clusterIssuerName: "" 
+
+gateway:
+  enabled: false
+  gatewayClassName: "envoy-gateway-class"
+  listeners:
+    - name: "http"
+      protocol: "HTTP"
+      port: 80
+    - name: "https"
+      protocol: "HTTPS"
+      port: 443
+      hostname: "*.duckdns.org"
+      certificateSecretNames:
+        - "voting-app-tls-secret"
+  routing:
+    vote:
+      hostname: "vote35.duckdns.org"
+      path: /
+    result:
+      hostname: "result35.duckdns.org"
+      path: /
+
+ingress:
+  enabled: false
+  scheme: internet-facing
+  certificateArn: ""
+  hosts:
+    vote: "vote35.duckdns.org"
+    result: "result35.duckdns.org"

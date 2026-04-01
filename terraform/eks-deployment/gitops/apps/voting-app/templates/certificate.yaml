@@ -1,0 +1,30 @@
+{{- if .Values.gateway.enabled -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "votingApp.fullname" . }}-tls
+  labels:
+    {{- include "votingApp.labels" . | nindent 4 }}
+spec:
+  {{- $certName := "" -}}
+  {{- range .Values.gateway.listeners -}}
+    {{- if eq .protocol "HTTPS" -}}
+      {{- $names := .certificateSecretNames | default (list) -}}
+      {{- if gt (len $names) 0 -}}
+        {{- $certName = index $names 0 -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  secretName: {{ $certName | default "voting-app-tls-secret" | quote }}
+  
+  issuerRef:
+    name: {{ .Values.clusterIssuerName }}
+    kind: ClusterIssuer
+    
+  commonName: {{ .Values.gateway.routing.vote.hostname }}
+  
+  dnsNames:
+    {{- range .Values.gateway.routing }}
+    - {{ .hostname }}
+    {{- end }}
+{{- end -}}

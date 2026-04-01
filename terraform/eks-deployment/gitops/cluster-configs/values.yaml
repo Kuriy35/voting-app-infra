@@ -1,0 +1,10 @@
+externalSecrets:
+  serviceAccount:
+    name: ""
+
+duckdns:
+  clusterIssuer:
+   name: "letsencrypt-duckdns"
+   email: "vjbvbhijk3@gmail.com"
+   groupName: "acme.duckdns.org"
+  tokenSecretName: ""

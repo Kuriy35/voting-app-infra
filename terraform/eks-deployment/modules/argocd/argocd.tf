@@ -8,13 +8,31 @@ resource "helm_release" "argocd" {
   version    = "9.4.17"
 
   values = [yamlencode({
+    global = {
+      domain = ""
+    }
+
+    configs = {
+      params = {
+        "server.insecure" = true
+      }
+    }
+
     server = {
-      service = {
-        type = "LoadBalancer"
+      ingress = {
+        enabled          = true
+        controller       = "aws"
+        ingressClassName = "alb"
+        hostname         = ""
         annotations = {
-          "service.beta.kubernetes.io/aws-load-balancer-scheme"  = "internet-facing"
-          "service.beta.kubernetes.io/aws-load-balancer-type"    = "external"
-          "service.beta.kubernetes.io/aws-load-balancer-subnets" = join(",", var.public_subnet_ids)
+          "alb.ingress.kubernetes.io/scheme"           = "internet-facing"
+          "alb.ingress.kubernetes.io/target-type"      = "ip"
+          "alb.ingress.kubernetes.io/backend-protocol" = "HTTP"
+          "alb.ingress.kubernetes.io/listen-ports"     = "[{\"HTTP\":80}]"
+        }
+        aws = {
+          serviceType            = "ClusterIP"
+          backendProtocolVersion = "HTTP1"
         }
       }
     }
@@ -35,7 +53,7 @@ resource "kubectl_manifest" "application" {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name      = "${var.project_id}-${var.env}"
+      name      = "root"
       namespace = "argocd"
     }
     spec = {
@@ -43,11 +61,24 @@ resource "kubectl_manifest" "application" {
       source = {
         repoURL        = var.git_repo_url
         targetRevision = "main"
-        path           = "helm-charts/voting-app"
+        path           = "terraform/eks-deployment/gitops/root-app"
+
+        helm = {
+          valuesObject = {
+            clusterName = var.cluster_name
+            vpcId       = var.vpc_id
+            externalSecrets = {
+              irsaRoleArn = var.external_secrets_operator_role_arn
+            }
+            duckdns = {
+              tokenSecretName = var.duckdns_token_secret_name
+            }
+          }
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
-        namespace = "voting-app"
+        namespace = "argocd"
       }
       syncPolicy = {
         automated = {
