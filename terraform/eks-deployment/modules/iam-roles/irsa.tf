@@ -68,7 +68,7 @@ resource "aws_iam_role" "external_secrets_operator" {
         }
         Condition = {
           StringEquals = {
-            "${trimprefix(var.oidc_issuer, "https://")}:sub" = "system:serviceaccount:external-secrets:external-secrets"
+            "${trimprefix(var.oidc_issuer, "https://")}:sub" = "system:serviceaccount:cert-manager:external-secrets-sa"
             "${trimprefix(var.oidc_issuer, "https://")}:aud" = "sts.amazonaws.com"
           }
         }
