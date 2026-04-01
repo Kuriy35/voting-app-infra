@@ -20,7 +20,7 @@ spec:
             type: PathPrefix
             value: {{ .path }}
       backendRefs:
-        - name: {{ include "votingApp.fullname" . }}-vote-svc
-          port: {{ .Values.vote.service.externalPort }}
+        - name: {{ include "votingApp.fullname" $ }}-vote-svc
+          port: {{ $.Values.vote.service.externalPort }}
   {{- end -}}
 {{- end -}}
